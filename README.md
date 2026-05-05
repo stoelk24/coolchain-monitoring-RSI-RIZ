@@ -1,102 +1,99 @@
-# coolchain-monitoring-RSE.
+# CoolChain Monitoring RSE
 
-Der Hersteller **„Food Solution Hildesheim“** produziert Bio-Dönerspieße und bietet eine zertifizierte Kühlkette an.
-Die Einhaltung kann vom Endkunden über einen **QR-Code** überprüft werden.
-Das Projekt wurde durchgeführt von Alexander Holzenkamp, Fynn Bremer und Tom Stoelken.
+Der Hersteller **Food Solution Hildesheim** produziert Bio-Dönerspieße und bietet seinen Endkunden eine zertifizierte Kühlkette an.  
+Die Einhaltung der Kühlkette kann vom Endkunden über einen **QR-Code** überprüft werden.
+
+Dieses Projekt wurde durchgeführt von:
+
+- Alexander Holzenkamp
+- Fynn Bremer
+- Tom Stoelken
 
 ---
 
-## Kühlkettenüberwachung
+## Projektbeschreibung
 
-Dieses Python-Programm überprüft für vorgegebene Transport-IDs die Einhaltung der Kühlkette.
+Dieses Python-Programm überprüft für vorgegebene Transport-IDs, ob die Kühlkette eingehalten wurde.  
+Das Projekt baut auf **CoolChainProjekt Phase 1** auf und wurde in **Phase 2** um zusätzliche Funktionen erweitert.
+
+Ziel des Programms ist es, Fehler in der Kühlkette automatisch zu erkennen und verständlich auszugeben.
 
 ---
 
 ## Projektphase 1
 
+In Phase 1 wurden die grundlegenden Prüfungen der Kühlkette umgesetzt.
+
 Das Programm prüft folgende Kriterien:
 
-* **Stimmigkeit je Station**
+### Stimmigkeit je Transportstation
 
-  * Jede Station besitzt ein Ein- und Auschecken
-  * Reihenfolge: `in → out`
+- Jede Transportstation besitzt ein Einchecken und ein Auschecken.
+- Die Reihenfolge der Einträge muss zeitlich korrekt sein.
+- Die erwartete Reihenfolge lautet: `in → out`.
 
-* **Übergaben ohne Kühlung**
+### Übergaben ohne Kühlung
 
-  * Maximal **10 Minuten** zwischen zwei Stationen
+- Zwischen dem Auschecken aus einer Station und dem Einchecken in die nächste Station dürfen maximal **10 Minuten** liegen.
+- Wird diese Zeit überschritten, gilt die Kühlkette als fehlerhaft.
 
-* **Gesamttransportdauer**
+### Gesamttransportdauer
 
-  * Maximal **48 Stunden**
+- Die gesamte Transportdauer eines Produkts darf maximal **48 Stunden** betragen.
+- Wird diese Grenze überschritten, wird ein Fehler ausgegeben.
 
 ---
 
-## Projektphase 2 (Erweiterung)
+## Projektphase 2
+
+In Phase 2 wurde das bestehende Programm um drei neue Funktionen erweitert.
 
 ### Temperaturüberwachung
 
-* Auswertung der Tabelle `tempdata`
-* Gültiger Bereich: **+2 °C bis +4 °C**
-* Ausgabe von Temperaturabweichungen
+Die Temperaturdaten der Kühlstationen werden aus der Tabelle `tempdata` ausgewertet.
 
----
+- Erlaubter Temperaturbereich: **+2 °C bis +4 °C**
+- Temperaturabweichungen werden erkannt und ausgegeben.
+- Die Prüfung dient der zusätzlichen Qualitätssicherung während Transport und Lagerung.
 
-### Entschlüsselung der Daten
+### Entschlüsselung verschlüsselter Daten
 
-* Tabellen:
+In Phase 2 liegen bestimmte Stammdaten verschlüsselt vor.  
+Das Programm entschlüsselt diese Daten, damit sie weiterverarbeitet werden können.
 
-  * `company_crypt`
-  * `transportstation_crypt`
-* Verschlüsselung: **AES (CBC Mode)**
+Verwendete Tabellen:
 
----
+- `company_crypt`
+- `transportstation_crypt`
+
+Verwendetes Verfahren:
+
+- AES-Verschlüsselung
+- CBC Mode
+- PyCryptodome-Bibliothek
 
 ### Wetterdaten bei Übergabefehlern
 
-* Bei Überschreitung der Übergabezeit wird die Außentemperatur abgefragt
-* Datenquelle: **Visual Crossing API**
-* Ausgabe direkt in der Fehlermeldung
+Wenn eine Übergabe ohne Kühlung länger als 10 Minuten dauert, wird zusätzlich die Außentemperatur am Auslagerungsort abgefragt.
+
+- Datenquelle: **Visual Crossing Weather API**
+- Abfrage über Postleitzahl und Zeitpunkt
+- Ausgabe der Wetterinformation direkt in der Fehlermeldung
 
 ---
 
-## Voraussetzungen
+## Projektstruktur
 
-* Windows
-* Python 3.12
-* Microsoft ODBC Driver 17 oder 18 für SQL Server
-
----
-
-## Verwendung
-
-1. In `src/main.py` die **Company-ID prüfen/anpassen**
-2. Programm starten:
-
-```bash
-python src/main.py
-```
-
----
-
-## Ausgabe
-
-* Für jede Transport-ID: **OK / FAIL**
-* Bei Fehlern: **klare Begründung**
-* Bei Übergabefehlern: zusätzliche **Wetterinformation**
-
----
-
-## Start
-
-* Doppelklick auf `Start_Kuehlkette.bat`
-  oder
-* Start über VS Code / Terminal
-
----
-
-## Beispielausgabe
+Die Projektdateien sind folgendermaßen aufgebaut:
 
 ```text
-OK   ID 72359278599178561029675: Kühlkette eingehalten
-FAIL ID 15668407856331648336231: Übergabe: > 10 min | Wetter: 6 °C
-```
+coolchain-monitoring-RSE/
+├── src/
+│   ├── main.py
+│   ├── temperaturueberwachung.py
+│   ├── entschluesselung.py
+│   ├── wetterdaten_abfrage.py
+│   └── Doxyfile
+├── docs/
+├── README.md
+└── Start_Kuehlkette.bat
